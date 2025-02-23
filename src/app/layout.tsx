@@ -31,7 +31,9 @@ export default function RootLayout({
         <div className="text-base text-foreground">
           <Link href="/">wordcraft</Link>
         </div>
-        {children}
+        <div className="flex items-center justify-center gap-16 font-[family-name:var(--font-geist-sans)] overflow-auto border border-foreground">
+          {children}
+        </div>
       </body>
     </html>
   );
