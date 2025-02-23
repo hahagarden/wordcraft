@@ -1,5 +1,4 @@
-import MainButton from "@/components/MainButton";
-import SecondaryButton from "@/components/SecondaryButton";
+import { MainButton, SecondaryButton } from "@/components";
 
 export default function Home() {
   return (

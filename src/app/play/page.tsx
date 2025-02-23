@@ -1,5 +1,4 @@
-import MainButton from "@/components/MainButton";
-import SmallButton from "@/components/SmallButton";
+import { MainButton, SmallButton } from "@/components";
 
 export default function Play() {
   return (
