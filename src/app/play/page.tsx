@@ -2,7 +2,7 @@ import { MainButton, SmallButton } from "@/components";
 
 export default function Play() {
   return (
-    <div className="flex flex-col justify-center gap-8">
+    <div className="m-auto flex flex-col justify-center gap-8">
       <div className="flex flex-col justify-center items-center gap-4">
         <p className="text-center">다음 단어를 사용해 문장을 만들어보세요!</p>
         <div className="flex flex-wrap justify-center gap-2">

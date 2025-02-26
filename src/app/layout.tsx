@@ -26,14 +26,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased grid grid-rows-[20px_1fr] gap-4 p-20 h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased grid grid-rows-[auto_1fr] p-20 h-screen`}
       >
+        {/* 로고 */}
         <div className="text-base text-foreground">
           <Link href="/">wordcraft</Link>
         </div>
-        <div className="flex items-center justify-center gap-16 font-[family-name:var(--font-geist-sans)] overflow-auto border border-foreground">
-          {children}
-        </div>
+
+        <div className="flex overflow-auto border border-foreground">{children}</div>
       </body>
     </html>
   );
