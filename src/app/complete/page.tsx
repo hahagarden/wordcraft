@@ -1,50 +1,98 @@
+"use client";
+
 import { MainButton, SecondaryButton } from "@/components";
 import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
 
 export default function Complete() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const [score, setScore] = useState(0);
+  const foundScoreRef = useRef(false);
+
+  useEffect(() => {
+    // 페이지 로드 시 자동으로 API 호출 시작
+    postScore();
+  }, []);
+
+  const postScore = async () => {
+    setIsLoading(true);
+    setMessage("");
+    foundScoreRef.current = false;
+
+    // 로컬 스토리지에서 단어와 문장 가져오기
+    const storedWords = localStorage.getItem("WORDCRAFT_WORDS");
+    const storedSentence = localStorage.getItem("WORDCRAFT_SENTENCE");
+
+    if (!storedWords || !storedSentence) {
+      setIsLoading(false);
+      alert("단어나 문장이 없습니다. 다시 시도해주세요.");
+      return;
+    }
+
+    const words = JSON.parse(storedWords);
+    const sentence = storedSentence;
+
+    const wordsQuery = encodeURIComponent(words.join(","));
+    const sentenceQuery = encodeURIComponent(sentence);
+
+    const eventSource = new EventSource(`/api/score?words=${wordsQuery}&sentence=${sentenceQuery}`);
+
+    eventSource.onmessage = (event) => {
+      if (event.data === "시작") return;
+      if (event.data === "끝") {
+        setIsLoading(false);
+        eventSource.close();
+        return;
+      }
+
+      setMessage((prev) => {
+        const newMessage = prev + event.data;
+        const formattedMessage = newMessage.replaceAll(/\\n/g, "\n");
+
+        if (!foundScoreRef.current) {
+          extractScoreFromMessage(formattedMessage);
+        }
+
+        return formattedMessage;
+      });
+    };
+
+    eventSource.onerror = (error) => {
+      console.log("EventSource Error", error);
+      eventSource.close();
+      setIsLoading(false);
+    };
+
+    eventSource.onopen = () => {
+      console.log("SSE connection opened");
+    };
+  };
+
+  // 메시지에서 점수를 추출하는 함수
+  const extractScoreFromMessage = (currentMessage: string) => {
+    try {
+      const scoreMatch = currentMessage.match(/(?:총점):\s*(\d+)(?:점)?/i);
+      if (scoreMatch && scoreMatch[1]) {
+        const extractedScore = parseInt(scoreMatch[1], 10);
+        if (!isNaN(extractedScore)) {
+          setScore(extractedScore);
+          foundScoreRef.current = true; // 점수를 찾았으므로 플래그 설정
+        }
+      }
+    } catch (error) {
+      console.error("점수 파싱 오류:", error);
+    }
+  };
+
   return (
     <main className="m-auto flex flex-col items-center gap-8 p-10 overflow-auto">
       <div className="flex flex-col items-center gap-4">
-        <span>제 점수는요 . . .</span>
-        <span className="text-5xl font-medium">68점</span>
+        <span className="text-5xl font-medium">{score ? `${score}점` : isLoading ? "" : "?"}</span>
       </div>
 
-      <div className="w-96">
-        <p className="mb-4">
-          창의성:{" "}
-          <strong data-start="5" data-end="12">
-            70점
-          </strong>
-          <br />
-          뱀꿈 → 피아노 연주 → 공기청정기 반응이라는 흐름이 자연스럽지만, 다소 일상적인 전개라서 더 독창적인 발상이
-          들어가면 좋을 것 같아요. 예를 들어, 뱀과 피아노, 공기청정기의 관계를 더 기묘하거나 예상치 못한 방식으로 엮으면
-          창의성이 올라갈 듯해요.
-        </p>
-        <p className="mb-4">
-          고급스러움:{" "}
-          <strong data-start="166" data-end="173">
-            60점
-          </strong>
-          <br />
-          문장은 전체적으로 부드럽고 자연스럽지만, 단어 선택이 다소 평이해요. 조금 더 세련된 표현이나 문학적인 요소를
-          가미하면 점수가 올라갈 거예요.
-        </p>
-        <p className="mb-4">
-          재치:{" "}
-          <strong data-start="263" data-end="270">
-            75점
-          </strong>
-          <br />
-          공기청정기의 빨간불을 보고 ‘피아노에 먼지가 많았나’라고 생각하는 부분이 소소한 유머 요소로 작용해서 재치 있는
-          느낌을 줍니다. 하지만 더 반전 요소나 의외성이 들어가면 더 높은 점수를 받을 수 있어요.
-        </p>
-        <p className="mb-4">
-          <strong data-start="390" data-end="401">
-            총점: 68점
-          </strong>
-          <br />꽤 자연스럽고 재치 있는 문장이지만, 좀 더 기발한 연결고리나 고급스러운 표현이 추가되면 더 높은 점수를
-          받을 수 있을 것 같아요!
-        </p>
+      <div className="w-96 p-6 bg-background rounded-lg min-h-[200px]">
+        <div className="whitespace-pre-wrap">{message}</div>
       </div>
 
       <div className="flex justify-center gap-4">
