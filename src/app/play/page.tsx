@@ -2,6 +2,7 @@
 
 import { MainButton, SmallButton } from "@/components";
 import useLocalStorageState from "@/hooks/useLocalStorageState";
+import { getWords } from "@/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -12,21 +13,14 @@ export default function Play() {
   const [words, setWords] = useLocalStorageState("WORDCRAFT_WORDS", DEFAULT_WORDS);
   const [sentence, setSentence] = useState("");
 
-  const getWords = async () => {
-    const res = await fetch("/api/words");
-    const data = await res.json();
-
-    if (data.words) {
-      return data.words;
-    } else {
+  const resetWords = async () => {
+    try {
+      const newWords = await getWords();
+      setWords(newWords);
+    } catch (error) {
+      console.error(error);
       alert("단어를 불러오는데 실패했어요.");
     }
-  };
-
-  const resetWords = async () => {
-    const words = await getWords();
-
-    setWords(words);
   };
 
   const handleSentenceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
