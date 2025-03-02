@@ -1,6 +1,7 @@
 "use client";
 
 import { MainButton, SecondaryButton } from "@/components";
+import { getScoreStream, getStoredWordsAndSentence, extractScoreFromMessage } from "@/api";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 
@@ -9,34 +10,39 @@ export default function Complete() {
   const [message, setMessage] = useState("");
   const [score, setScore] = useState(0);
   const foundScoreRef = useRef(false);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
     // 페이지 로드 시 자동으로 API 호출 시작
-    postScore();
+    fetchScore();
+
+    // Clean up 함수
+    return () => {
+      // EventSource가 있다면 닫기
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
   }, []);
 
-  const postScore = async () => {
+  // 페이지 로드 시 실행할 함수
+  const fetchScore = async () => {
     setIsLoading(true);
     setMessage("");
     foundScoreRef.current = false;
 
     // 로컬 스토리지에서 단어와 문장 가져오기
-    const storedWords = localStorage.getItem("WORDCRAFT_WORDS");
-    const storedSentence = localStorage.getItem("WORDCRAFT_SENTENCE");
+    const { words, sentence } = getStoredWordsAndSentence();
 
-    if (!storedWords || !storedSentence) {
+    if (!words || !sentence) {
       setIsLoading(false);
       alert("단어나 문장이 없습니다. 다시 시도해주세요.");
       return;
     }
 
-    const words = JSON.parse(storedWords);
-    const sentence = storedSentence;
-
-    const wordsQuery = encodeURIComponent(words.join(","));
-    const sentenceQuery = encodeURIComponent(sentence);
-
-    const eventSource = new EventSource(`/api/score?words=${wordsQuery}&sentence=${sentenceQuery}`);
+    // EventSource 생성 및 이벤트 처리
+    const eventSource = getScoreStream(words, sentence);
+    eventSourceRef.current = eventSource;
 
     eventSource.onmessage = (event) => {
       if (event.data === "시작") return;
@@ -51,7 +57,11 @@ export default function Complete() {
         const formattedMessage = newMessage.replaceAll(/\\n/g, "\n");
 
         if (!foundScoreRef.current) {
-          extractScoreFromMessage(formattedMessage);
+          const extractedScore = extractScoreFromMessage(formattedMessage);
+          if (extractedScore !== null) {
+            setScore(extractedScore);
+            foundScoreRef.current = true;
+          }
         }
 
         return formattedMessage;
@@ -67,22 +77,6 @@ export default function Complete() {
     eventSource.onopen = () => {
       console.log("SSE connection opened");
     };
-  };
-
-  // 메시지에서 점수를 추출하는 함수
-  const extractScoreFromMessage = (currentMessage: string) => {
-    try {
-      const scoreMatch = currentMessage.match(/(?:총점):\s*(\d+)(?:점)?/i);
-      if (scoreMatch && scoreMatch[1]) {
-        const extractedScore = parseInt(scoreMatch[1], 10);
-        if (!isNaN(extractedScore)) {
-          setScore(extractedScore);
-          foundScoreRef.current = true; // 점수를 찾았으므로 플래그 설정
-        }
-      }
-    } catch (error) {
-      console.error("점수 파싱 오류:", error);
-    }
   };
 
   return (
