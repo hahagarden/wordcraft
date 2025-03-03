@@ -8,7 +8,7 @@ export default function Home() {
           <MainButton>게임 시작하기</MainButton>
         </a>
         <a href="/community">
-          <SecondaryButton>구경하기</SecondaryButton>{" "}
+          <SecondaryButton>구경하기</SecondaryButton>
         </a>
       </div>
     </main>

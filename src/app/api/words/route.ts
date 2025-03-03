@@ -28,7 +28,6 @@ export async function GET() {
     }
 
     const data = await response.json();
-    console.log("gpt data ****", data, data.choices?.[0]?.message?.content);
     const reply = data.choices?.[0]?.message?.content ?? "{}";
 
     let words;
