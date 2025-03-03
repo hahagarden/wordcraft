@@ -30,7 +30,7 @@ const useLocalStorageState = <T = unknown>(key: string, initialValue: T) => {
     }
   }, [key, state, mounted]);
 
-  return [state, setState] as const;
+  return [state, setState, mounted] as const;
 };
 
 export default useLocalStorageState;
