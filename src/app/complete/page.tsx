@@ -1,9 +1,10 @@
 "use client";
 
 import { MainButton, SecondaryButton } from "@/components";
-import { getScoreStream, getStoredWordsAndSentence, extractScoreFromMessage } from "@/api";
+import { getScoreStream, getStoredWordsAndSentence, extractScoreFromMessage, getWords } from "@/api";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { useFetch } from "@/hooks";
 
 export default function Complete() {
   const [isLoading, setIsLoading] = useState(true);
@@ -11,6 +12,8 @@ export default function Complete() {
   const [score, setScore] = useState(0);
   const foundScoreRef = useRef(false);
   const eventSourceRef = useRef<EventSource | null>(null);
+
+  const { fetchData: fetchResetWords } = useFetch(getWords);
 
   useEffect(() => {
     // 페이지 로드 시 자동으로 API 호출 시작
@@ -24,6 +27,16 @@ export default function Complete() {
       }
     };
   }, []);
+
+  const resetWords = async () => {
+    try {
+      const newWords = await fetchResetWords();
+      localStorage.setItem("WORDCRAFT_WORDS", JSON.stringify(newWords));
+    } catch (error) {
+      console.error(error);
+      alert("단어를 불러오는데 실패했어요.");
+    }
+  };
 
   // 페이지 로드 시 실행할 함수
   const fetchScore = async () => {
@@ -39,6 +52,9 @@ export default function Complete() {
       alert("단어나 문장이 없습니다. 다시 시도해주세요.");
       return;
     }
+
+    // 단어 초기화
+    resetWords();
 
     // EventSource 생성 및 이벤트 처리
     const eventSource = getScoreStream(words, sentence);
