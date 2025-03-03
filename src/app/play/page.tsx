@@ -1,26 +1,74 @@
 "use client";
 
-import { MainButton, SmallButton } from "@/components";
+import { MainButton, SmallButton, Spinner } from "@/components";
 import useLocalStorageState from "@/hooks/useLocalStorageState";
 import { getWords } from "@/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useFetch } from "@/hooks/useFetch";
+
+interface Chances {
+  lastUpdated: string;
+  chances: number;
+}
 
 const DEFAULT_WORDS = ["고양이", "우주", "탐험"];
+const DEFAULT_CHANCES = 5;
 
 export default function Play() {
   const router = useRouter();
   const [words, setWords] = useLocalStorageState("WORDCRAFT_WORDS", DEFAULT_WORDS);
   const [sentence, setSentence] = useState("");
+  const [chances, setChances] = useLocalStorageState<Chances>("WORDCRAFT_CHANCES", {
+    lastUpdated: new Date().toDateString(),
+    chances: DEFAULT_CHANCES,
+  });
+
+  const { fetchData: fetchResetWords, isLoading: isLoadingFetchResetWords } = useFetch(getWords);
+
+  // 단어 교체 기회 차감
+  const decreaseChances = () => {
+    setChances(() => ({
+      lastUpdated: new Date().toDateString(),
+      chances: chances.chances - 1,
+    }));
+  };
+
+  // 날짜가 바뀌었으면 초기화 여부 true
+  const shouldResetChances = () => {
+    const lastUpdated = chances.lastUpdated;
+    const today = new Date().toDateString();
+    return lastUpdated !== today;
+  };
 
   const resetWords = async () => {
     try {
-      const newWords = await getWords();
+      const newWords = await fetchResetWords();
       setWords(newWords);
     } catch (error) {
       console.error(error);
       alert("단어를 불러오는데 실패했어요.");
     }
+  };
+
+  // 단어 교체
+  const handleClickResetWords = async () => {
+    if (chances.chances <= 0) {
+      alert("기회를 모두 소진했어요.");
+      return;
+    }
+
+    await resetWords();
+
+    // 날짜 바뀌었으면 기회 초기화
+    if (shouldResetChances()) {
+      setChances(() => ({
+        lastUpdated: new Date().toDateString(),
+        chances: DEFAULT_CHANCES,
+      }));
+    }
+
+    decreaseChances();
   };
 
   const handleSentenceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -55,7 +103,13 @@ export default function Play() {
           <span className="h-10 flex items-center bg-green-500 text-white px-4 rounded-sm">{words[1]}</span>
           <span className="h-10 flex items-center bg-red-400 text-white px-4 rounded-sm">{words[2]}</span>
         </div>
-        <SmallButton onClick={resetWords}>단어 바꾸기 (5/5)</SmallButton>
+        <SmallButton onClick={handleClickResetWords} customClassName="w-36">
+          {isLoadingFetchResetWords ? (
+            <Spinner customClassName="w-4 h-4" />
+          ) : (
+            `단어 바꾸기 (${chances.chances}/${DEFAULT_CHANCES})`
+          )}
+        </SmallButton>
       </div>
 
       <div className="flex flex-col items-center gap-4">
