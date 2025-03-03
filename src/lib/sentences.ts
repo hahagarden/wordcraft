@@ -25,3 +25,22 @@ export async function saveSentence(sentence: string, words: string[]): Promise<S
     return null;
   }
 }
+
+export async function getSentences(): Promise<Sentence[]> {
+  try {
+    const { data: sentences, error } = await supabase
+      .from("sentences")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching sentences:", error);
+      return [];
+    }
+
+    return sentences || [];
+  } catch (error) {
+    console.error("Error fetching sentences:", error);
+    return [];
+  }
+}
