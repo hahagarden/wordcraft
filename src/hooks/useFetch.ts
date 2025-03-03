@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export const useFetch = <TData>(fetchFn: () => Promise<TData>) => {
+const useFetch = <TData>(fetchFn: () => Promise<TData>) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
@@ -17,3 +17,5 @@ export const useFetch = <TData>(fetchFn: () => Promise<TData>) => {
 
   return { isLoading, fetchData };
 };
+
+export default useFetch;

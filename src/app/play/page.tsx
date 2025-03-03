@@ -1,11 +1,10 @@
 "use client";
 
 import { MainButton, SmallButton, Spinner } from "@/components";
-import useLocalStorageState from "@/hooks/useLocalStorageState";
 import { getWords } from "@/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useFetch } from "@/hooks/useFetch";
+import { useFetch, useLocalStorageState } from "@/hooks";
 
 interface Chances {
   lastUpdated: string;
