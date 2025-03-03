@@ -9,12 +9,17 @@ export async function GET() {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_GPT_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4-turbo",
+        model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "너는 단어 생성기야." },
+          {
+            role: "system",
+            content: `너는 단어 생성기야.
+            사물, 사람, 동물, 자연, 문화, 기술, 예술, 과학, 역사, 지리, 식물, 취미, 시사, 경제 중에서 랜덤으로 3개의 주제를 골라 주제에 관련된 단어를 생성할거야.
+            `,
+          },
           { role: "user", content: `단어 3개를 JSON 형식으로 제공해줘. 예제: {"words": ["고양이", "우주", "탐험"]}` },
         ],
-        temperature: 0.7,
+        temperature: 1.0,
       }),
     });
 
