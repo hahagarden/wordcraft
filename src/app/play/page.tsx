@@ -5,6 +5,7 @@ import { getWords } from "@/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFetch, useLocalStorageState } from "@/hooks";
+import { saveSentence } from "@/lib/sentences";
 
 interface Chances {
   lastUpdated: string;
@@ -90,6 +91,7 @@ export default function Play() {
     }
 
     localStorage.setItem("WORDCRAFT_SENTENCE", sentence);
+    saveSentence(sentence, words);
     router.push("/complete");
   };
 
