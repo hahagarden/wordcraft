@@ -5,8 +5,10 @@ import { getScoreStream, getStoredWordsAndSentence, extractScoreFromMessage, get
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useFetch } from "@/hooks";
+import { useRouter } from "next/navigation";
 
 export default function Complete() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [score, setScore] = useState(0);
@@ -16,6 +18,13 @@ export default function Complete() {
   const { fetchData: fetchResetWords } = useFetch(getWords);
 
   useEffect(() => {
+    // 이미 채점이 완료되었는지 확인
+    const { words, sentence } = getStoredWordsAndSentence();
+    if (!words || !sentence) {
+      router.replace("/play");
+      return;
+    }
+
     // 페이지 로드 시 자동으로 API 호출 시작
     fetchScore();
 
@@ -53,9 +62,6 @@ export default function Complete() {
       return;
     }
 
-    // 단어 초기화
-    resetWords();
-
     // EventSource 생성 및 이벤트 처리
     const eventSource = getScoreStream(words, sentence);
     eventSourceRef.current = eventSource;
@@ -65,6 +71,10 @@ export default function Complete() {
       if (event.data === "끝") {
         setIsLoading(false);
         eventSource.close();
+        // 채점이 완료되면 로컬 스토리지의 문장 데이터 삭제
+        localStorage.removeItem("WORDCRAFT_SENTENCE");
+        // 단어 초기화
+        resetWords();
         return;
       }
 
