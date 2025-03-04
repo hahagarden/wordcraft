@@ -20,7 +20,7 @@ export default function Play() {
   const [words, setWords, isWordsLoaded] = useLocalStorageState("WORDCRAFT_WORDS", DEFAULT_WORDS);
   const [sentence, setSentence] = useState("");
   const [chances, setChances, isChancesLoaded] = useLocalStorageState<Chances>("WORDCRAFT_CHANCES", {
-    lastUpdated: new Date().toDateString(),
+    lastUpdated: new Date().toISOString(),
     chances: DEFAULT_CHANCES,
   });
 
@@ -29,7 +29,7 @@ export default function Play() {
   // 날짜가 바뀌었으면 초기화 여부 true
   const shouldResetChances = () => {
     const lastUpdated = chances.lastUpdated;
-    const today = new Date().toDateString();
+    const today = new Date().toISOString();
     return lastUpdated !== today;
   };
 
@@ -55,7 +55,7 @@ export default function Play() {
     // 날짜 바뀌었으면 기회 초기화(보너스 기회), 아니면 1 감소
     if (shouldResetChances()) {
       setChances({
-        lastUpdated: new Date().toDateString(),
+        lastUpdated: new Date().toISOString(),
         chances: DEFAULT_CHANCES,
       });
     } else {
