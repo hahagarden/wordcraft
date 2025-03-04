@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wordcraft
 
-## Getting Started
+### 프로젝트 개요
+ChatGPT API를 이용하여 단어를 생성하고, 사용자가 주어진 단어들로 문장을 작성하여 제출하면 ChatGPT가 창의성, 문장력, 재치성에 대해 채점을 해주는 미니게임입니다.
+단어 교체는 하루에 10번까지 가능합니다.
+다른 유저들이 만든 문장을 구경할 수 있습니다.
 
-First, run the development server:
+### 기술스택
+NextJS TypeScript TailwindCSS Supabase Vercel
+(OpenAI API) (localStorage)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 배포링크
+https://www.hahagarden.dev
+
+### 1분 소개 영상
+<img src="https://github.com/user-attachments/assets/095e3083-6e83-4b88-bb48-e3c3ba62baba" width="500" height="750" />
+
+### 폴더 구조
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+src
+ ┣ api
+ ┃ ┣ index.ts
+ ┃ ┣ score.ts
+ ┃ ┗ words.ts
+ ┣ app
+ ┃ ┣ api
+ ┃ ┃ ┣ score
+ ┃ ┃ ┃ ┗ route.ts
+ ┃ ┃ ┗ words
+ ┃ ┃ ┃ ┗ route.ts
+ ┃ ┣ community
+ ┃ ┃ ┗ page.tsx
+ ┃ ┣ complete
+ ┃ ┃ ┗ page.tsx
+ ┃ ┣ play
+ ┃ ┃ ┗ page.tsx
+ ┃ ┣ favicon.ico
+ ┃ ┣ globals.css
+ ┃ ┣ layout.tsx
+ ┃ ┗ page.tsx
+ ┣ components
+ ┃ ┣ MainButton.tsx
+ ┃ ┣ SecondaryButton.tsx
+ ┃ ┣ SmallButton.tsx
+ ┃ ┣ Spinner.tsx
+ ┃ ┗ index.ts
+ ┣ hooks
+ ┃ ┣ index.ts
+ ┃ ┣ useFetch.ts
+ ┃ ┗ useLocalStorageState.ts
+ ┣ lib
+ ┃ ┣ sentences.ts
+ ┃ ┗ supabase.ts
+ ┗ types
+ ┃ ┗ database.types.ts
+```
