@@ -26,14 +26,6 @@ export default function Play() {
 
   const { fetchData: fetchResetWords, isLoading: isLoadingFetchResetWords } = useFetch(getWords);
 
-  // 단어 교체 기회 차감
-  const decreaseChances = () => {
-    setChances(() => ({
-      lastUpdated: new Date().toDateString(),
-      chances: chances.chances - 1,
-    }));
-  };
-
   // 날짜가 바뀌었으면 초기화 여부 true
   const shouldResetChances = () => {
     const lastUpdated = chances.lastUpdated;
@@ -60,15 +52,18 @@ export default function Play() {
 
     await resetWords();
 
-    // 날짜 바뀌었으면 기회 초기화
+    // 날짜 바뀌었으면 기회 초기화(보너스 기회), 아니면 1 감소
     if (shouldResetChances()) {
-      setChances(() => ({
+      setChances({
         lastUpdated: new Date().toDateString(),
         chances: DEFAULT_CHANCES,
-      }));
+      });
+    } else {
+      setChances({
+        lastUpdated: chances.lastUpdated,
+        chances: chances.chances - 1,
+      });
     }
-
-    decreaseChances();
   };
 
   const handleSentenceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
