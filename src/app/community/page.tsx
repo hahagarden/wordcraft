@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { MainButton } from "@/components";
 import Link from "next/link";
 import { getSentences } from "@/lib/sentences";
