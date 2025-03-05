@@ -8,7 +8,7 @@ export default async function Page() {
   const sentences = await getSentences();
 
   return (
-    <div className="w-full m-[0_auto] flex flex-col gap-4 p-4">
+    <div className="w-full m-[0_auto] flex flex-col gap-6 p-6">
       <div className="flex flex-col gap-4 h-full overflow-auto">
         {sentences.map((sentence) => (
           <div key={sentence.id} className="bg-background text-foreground p-4 rounded-xl border">
