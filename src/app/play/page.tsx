@@ -92,7 +92,7 @@ export default function Play() {
   };
 
   return (
-    <div className="m-auto flex flex-col justify-center gap-8">
+    <div className="m-auto flex flex-col justify-center gap-8 w-full max-w-lg px-4">
       <div className="flex flex-col justify-center items-center gap-4">
         <p className="text-center">다음 단어를 사용해 문장을 만들어보세요!</p>
         {isWordsLoaded && isChancesLoaded ? (
@@ -115,9 +115,9 @@ export default function Play() {
         )}
       </div>
 
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-4 w-full">
         <textarea
-          className="w-96 p-4 border rounded-lg bg-background"
+          className="w-full p-4 border rounded-lg bg-background"
           value={sentence}
           onChange={handleSentenceChange}
           placeholder="위의 단어들을 모두 사용하여 문장을 만들어보세요"
